@@ -5,9 +5,12 @@
  */
 package projectuts;
 
+import javax.security.auth.Subject;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JTextPane;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 /**
  *
  * @author Andri
@@ -27,6 +30,7 @@ public class Form extends javax.swing.JFrame {
     int qty = 0;
     String category = "";
     String categories [] = {"iPhone", "iWatch", "iPad","accecories"};
+    JComboBox catList = new JComboBox(categories);
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -198,7 +202,11 @@ public class Form extends javax.swing.JFrame {
             jQty.commitEdit();
         } catch ( java.text.ParseException e ) { }
         int value = (Integer) jQty.getValue();
-        
+        if (name.isEmpty() || color.isEmpty() || qty == 0) {
+            JOptionPane.showMessageDialog(null, "One Or More Fields Are Empty");
+        } else {
+            
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
     
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed

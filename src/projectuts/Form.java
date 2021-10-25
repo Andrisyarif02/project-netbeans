@@ -6,9 +6,12 @@
 package projectuts;
 
 //import java.awt.List;
+//import com.sun.org.apache.xalan.internal.lib.NodeInfo;
 import java.awt.Component;
-import java.io.Console;
+import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.security.auth.Subject;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -18,9 +21,15 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JTable;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
-import projectuts.item;
+import projectuts.Item;
 import javax.swing.table.TableColumn;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
+import org.apache.commons.collections4.*;
+import org.apache.commons.compress.*;
+import org.apache.logging.log4j.LogManager;
 /**
  *
  * @author Andri
@@ -30,6 +39,18 @@ public class Form extends javax.swing.JFrame {
      * Creates new form Form
      */
     
+    // Deklarasi variable
+    //    Item it = new Item();
+    List<Item> itemList = new ArrayList<Item>();
+    //    List<item> listItem = new ArrayList<item>();
+    DefaultTableModel model;
+    String name = "";
+    String color = "";
+    int qty = 0;
+    String category = "";
+    String categories [] = {"iPhone", "iWatch", "iPad","accecories"};
+    //    JComboBox catList = new JComboBox();
+    
     private FormController controller;
     public Form() {
         initComponents();
@@ -37,16 +58,76 @@ public class Form extends javax.swing.JFrame {
         controller = new FormController(this); 
     }
     
-//    item it = new item();
-    List<item> itemList = new ArrayList<item>();
-//    List<item> listItem = new ArrayList<item>();
-    DefaultTableModel model;
-    String name = "";
-    String color = "";
-    int qty = 0;
-    String category = "";
-    String categories [] = {"iPhone", "iWatch", "iPad","accecories"};
-//    JComboBox catList = new JComboBox();
+    private static void writeObject(List<Item> o) throws Exception {
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("itemLists.obj"));
+            oos.writeObject(o);
+            oos.flush();
+            oos.close();
+        } catch (FileNotFoundException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            throw ex;
+        }
+    }
+    
+    public void noTable(DefaultTableModel tabelModel) {
+        int baris = tabelModel.getRowCount();
+        for (int a = 0; a < baris; a++) {
+            String nomor = String.valueOf(a + 1);
+            tabelModel.setValueAt(nomor + ".", a, 0);
+        }
+    }
+    
+    public void addTableHeader() {
+        model = (DefaultTableModel) jTable1.getModel();
+//        itemVal = new Object[]{"name", "color", "qty","category"};
+//        model.setColumnIdentifiers((Vector) itemList);
+//        jTable1.setCellRenderer(new myTableCellRenderer());
+        for (int i = 0; i < itemList.size(); i++) {
+            List list = new ArrayList<>();
+            jTable1.setAutoCreateColumnsFromModel(true);
+            list.add("");
+            list.add(itemList.get(i).getName());
+            list.add(itemList.get(i).getColor());
+            list.add(itemList.get(i).getQty());
+            list.add(itemList.get(i).getCategory());
+            model.addRow(list.toArray());
+            noTable(model);
+        }
+    }
+    
+    private static List<Item> readObject() throws Exception {
+        List<Item> items = null;
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream("mahasiswacoba.obj"));
+        try {
+            items = (List<Item>) ois.readObject();
+            return items;
+        } catch (ClassNotFoundException ex) {
+            throw ex;
+        }
+    }
+    
+    class myTableCellRenderer implements TableCellRenderer {
+ 
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+ 
+//            Change Image column minimum width and maximum width
+            TableColumn tb = jTable1.getColumn("Image");
+            tb.setMaxWidth(60);
+            tb.setMinWidth(60);
+            jTable1.setRowHeight(60);
+            return (Component) value;
+ 
+        }
+    }
+    private void clearFields() {
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jQty.setValue(0);
+        jCategory.setSelectedIndex(0);
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -57,7 +138,7 @@ public class Form extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel3 = new javax.swing.JLabel();
+        jFileChooser1 = new javax.swing.JFileChooser();
         jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -67,15 +148,13 @@ public class Form extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
         jTextField2 = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-
-        jLabel3.setFont(new java.awt.Font("sansserif", 0, 18)); // NOI18N
-        jLabel3.setText("DATA");
+        jBtnExport = new javax.swing.JButton();
+        jBtnImport = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 153, 0));
@@ -123,10 +202,6 @@ public class Form extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setBackground(new java.awt.Color(0, 255, 51));
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("Check Item");
-
         jTextField2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField2ActionPerformed(evt);
@@ -138,10 +213,7 @@ public class Form extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+
             },
             new String [] {
                 "No", "Name", "Color", "Qty", "Categories"
@@ -150,12 +222,29 @@ public class Form extends javax.swing.JFrame {
             Class[] types = new Class [] {
                 java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
+        jTable1.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(jTable1);
+
+        jBtnExport.setText("Export");
+        jBtnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnExportActionPerformed(evt);
+            }
+        });
+
+        jBtnImport.setText("Import");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -165,19 +254,9 @@ public class Form extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jSeparator1)
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel4)
-                .addGap(255, 255, 255))
             .addGroup(layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton3))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -194,14 +273,26 @@ public class Form extends javax.swing.JFrame {
                                 .addGap(57, 57, 57))
                             .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
                             .addComponent(jTextField2))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBtnImport)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jBtnExport)))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addGap(255, 255, 255))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addComponent(jLabel4)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(24, 24, 24)
@@ -228,7 +319,8 @@ public class Form extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(jBtnExport)
+                    .addComponent(jBtnImport))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
@@ -240,26 +332,29 @@ public class Form extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        name = jTextField1.getText();
-        color = jTextField2.getText(    );
+        this.model = (DefaultTableModel) jTable1.getModel();
+        List list = new ArrayList<>();
+        jTable1.setAutoCreateColumnsFromModel(true);
+        list.add("");
+        list.add(jTextField1.getText());
+        list.add(jTextField2.getText());
         try {
             jQty.commitEdit();
         } catch ( java.text.ParseException e ) { }
-        qty = (Integer) jQty.getValue();
-        category = jCategory.getSelectedItem().toString(); 
-        if (name.isEmpty() || color.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "One Or More Fields Are Empty");
-        } else {
-            model.addRow(new Object[]{name, color, qty, category});
-            JOptionPane.showMessageDialog(null, "Data Inserted");
-            clearFields();
-//            System.out.println("Name : "+ name);
-//            System.out.println("Qty : "+ qty);
-//            System.out.println("Color : "+ color);
-//            System.out.println("Categroy : "+ category);
+        list.add((Integer) jQty.getValue());
+        list.add(jCategory.getSelectedItem().toString());
+        model.addRow(list.toArray());
+        noTable(model);
+
+        Item item = new Item(jTextField1.getText(), jTextField2.getText(), (Integer) jQty.getValue(), jCategory.getSelectedItem().toString());
+        itemList.add(item);
+
+        try {
+            writeObject(itemList);
+        } catch (Exception ex) {
+            Logger.getLogger(Form.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        clearFields();
     }//GEN-LAST:event_jButton1ActionPerformed
     
     
@@ -272,42 +367,101 @@ public class Form extends javax.swing.JFrame {
     }//GEN-LAST:event_jCategoryActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-                // TODO add your handling code here:
+        clearFields();
     }//GEN-LAST:event_jButton2ActionPerformed
-    
-    
-     public void addTableHeader() {
-        model = (DefaultTableModel) jTable1.getModel();
-        Object[] newIdentifiers = new Object[]{"name", "color", "qty","category"};
-        model.setColumnIdentifiers(newIdentifiers);
-//        jTable1.setCellRenderer(new myTableCellRenderer());
-    }
-    
-    class myTableCellRenderer implements TableCellRenderer {
- 
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
- 
-//            Change Image column minimum width and maximum width
-            TableColumn tb = jTable1.getColumn("Image");
-            tb.setMaxWidth(60);
-            tb.setMinWidth(60);
-            jTable1.setRowHeight(60);
-            return (Component) value;
- 
+
+    private void jBtnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnExportActionPerformed
+        FileOutputStream excelFOS = null;
+        BufferedOutputStream excelBOS = null;
+        Workbook workbook = null;
+        try {
+            JFileChooser excelFileChooser = new JFileChooser();
+            excelFileChooser.setDialogTitle("Save As ..");
+            FileNameExtensionFilter fnef = new FileNameExtensionFilter("Files", "xls", "xlsx", "xlsm");
+            excelFileChooser.setFileFilter(fnef);
+            int chooser = excelFileChooser.showSaveDialog(null);
+            
+            if (chooser == JFileChooser.APPROVE_OPTION) {
+                workbook = new XSSFWorkbook();
+                Sheet excelSheet = workbook.createSheet("Items");
+                CreationHelper createHelper = workbook.getCreationHelper();
+                
+//                for (int i = 0; i < model.getRowCount(); i++) {
+//                    XSSFRow excelRow = excelSheet.createRow(i);
+//                    for (int j = 0; j < model.getColumnCount(); j++) {
+//                        XSSFCell excelCell = excelRow.createCell(j);
+//                        excelCell.setCellValue(model.getValueAt(i, j).toString());
+//                    }
+//                }
+                
+                Font headerFont = workbook.createFont();
+                headerFont.setBold(true);
+                headerFont.setFontHeightInPoints((short) 14);
+                headerFont.setColor(IndexedColors.RED.getIndex());
+                
+                // Create a CellStyle with the font
+                CellStyle headerCellStyle = workbook.createCellStyle();
+                headerCellStyle.setFont(headerFont);
+
+                // Create a Row
+                Row headerRow = excelSheet.createRow(0);
+                
+                // Create cells
+                for(int i = 0; i < categories.length; i++) {
+                    Cell cell = headerRow.createCell(i);
+                    cell.setCellValue(categories[i]);
+                    cell.setCellStyle(headerCellStyle);
+                }
+                
+                // Create Other rows and cells with employees data
+                int rowNum = 1;
+                for(Item item: itemList) {
+                    Row row = excelSheet.createRow(rowNum++);
+
+                    row.createCell(0).setCellValue(item.getName());
+
+                    row.createCell(1).setCellValue(item.getColor());
+                    
+                    row.createCell(2).setCellValue(item.getQty());
+                    
+                    row.createCell(3).setCellValue(item.getCategory());
+                }
+
+                // Resize all columns to fit the content size
+                for(int i = 0; i < categories.length; i++) {
+                    excelSheet.autoSizeColumn(i);
+                }
+
+                
+                // Write output file
+                excelFOS = new FileOutputStream(excelFileChooser.getSelectedFile() + ".xlsx");
+                excelBOS = new BufferedOutputStream(excelFOS);
+                workbook.write(excelBOS);
+            } else {
+                System.out.println("Ga diapprove!");
+            }
+            
+            JOptionPane.showMessageDialog(null, "Exported Successfully!");
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(null, e);
+        } catch (IOException e){
+            JOptionPane.showMessageDialog(null, e);
+        } finally {
+            try {
+                if (excelFOS != null) {
+                    excelFOS.close();
+                }
+                if (excelBOS != null) {
+                    excelBOS.close();
+                }
+                if (workbook != null) {
+                    workbook.close();
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
         }
- 
-    }
-    private void clearFields() {
-        jTextField1.setText("");
-        jTextField2.setText("");
-        jQty.setValue(0);
-        jCategory.setSelectedIndex(0);
-    }
-    
-    
-     
-    
+    }//GEN-LAST:event_jBtnExportActionPerformed
  
 //     private void populateInptFields(){
 //         int selectedRow = jTable1.getSelectedRow();
@@ -350,13 +504,14 @@ public class Form extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jBtnExport;
+    private javax.swing.JButton jBtnImport;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JComboBox jCategory;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;

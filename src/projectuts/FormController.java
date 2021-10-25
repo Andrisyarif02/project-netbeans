@@ -18,6 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -28,6 +29,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import javax.swing.table.DefaultTableModel;
+//import projectuts.Form;
 
 /**
  *
@@ -35,7 +38,11 @@ import org.apache.poi.ss.usermodel.Workbook;
  */
 public class FormController {
 
-    FormController(Form aThis) {
-         //To change body of generated methods, choose Tools | Templates.
+    FormController(Form view) {
+        this.view = view;     
+        //To change body of generated methods, choose Tools | Templates.
     }
+    DefaultTableModel model;
+    private Form view;
+   
 }

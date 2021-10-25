@@ -5,12 +5,22 @@
  */
 package projectuts;
 
+//import java.awt.List;
+import java.awt.Component;
+import java.io.Console;
+import java.util.*;
 import javax.security.auth.Subject;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JTextPane;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
+import projectuts.item;
+import javax.swing.table.TableColumn;
 /**
  *
  * @author Andri
@@ -23,14 +33,20 @@ public class Form extends javax.swing.JFrame {
     private FormController controller;
     public Form() {
         initComponents();
-        controller = new FormController(this);      
+        addTableHeader();
+        controller = new FormController(this); 
     }
+    
+//    item it = new item();
+    List<item> itemList = new ArrayList<item>();
+//    List<item> listItem = new ArrayList<item>();
+    DefaultTableModel model;
     String name = "";
     String color = "";
     int qty = 0;
     String category = "";
     String categories [] = {"iPhone", "iWatch", "iPad","accecories"};
-    JComboBox catList = new JComboBox(categories);
+//    JComboBox catList = new JComboBox();
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -55,6 +71,8 @@ public class Form extends javax.swing.JFrame {
         jTextField2 = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         jLabel3.setFont(new java.awt.Font("sansserif", 0, 18)); // NOI18N
         jLabel3.setText("DATA");
@@ -99,6 +117,11 @@ public class Form extends javax.swing.JFrame {
         jButton2.setBackground(new java.awt.Color(255, 0, 0));
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("Clear");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setBackground(new java.awt.Color(0, 255, 51));
         jButton3.setForeground(new java.awt.Color(255, 255, 255));
@@ -113,21 +136,56 @@ public class Form extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("sansserif", 1, 13)); // NOI18N
         jLabel6.setText("Qty");
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "No", "Name", "Color", "Qty", "Categories"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(jTable1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jSeparator1)
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addGap(255, 255, 255))
             .addGroup(layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel5)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton3))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6))
+                        .addGap(23, 23, 23)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,19 +193,8 @@ public class Form extends javax.swing.JFrame {
                                     .addComponent(jQty, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(57, 57, 57))
                             .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
-                            .addComponent(jTextField2)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(35, 35, 35)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
-                        .addComponent(jButton3)
-                        .addGap(18, 18, 18))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jSeparator1)
+                            .addComponent(jTextField2))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -172,19 +219,17 @@ public class Form extends javax.swing.JFrame {
                         .addComponent(jQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel6)))
                 .addGap(16, 16, 16)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 185, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
-                            .addComponent(jButton2)
-                            .addComponent(jButton3))
-                        .addGap(17, 17, 17))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jCategory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCategory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         pack();
@@ -197,17 +242,26 @@ public class Form extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         name = jTextField1.getText();
-        color = jTextField2.getText();
+        color = jTextField2.getText(    );
         try {
             jQty.commitEdit();
         } catch ( java.text.ParseException e ) { }
-        int value = (Integer) jQty.getValue();
-        if (name.isEmpty() || color.isEmpty() || qty == 0) {
+        qty = (Integer) jQty.getValue();
+        category = jCategory.getSelectedItem().toString(); 
+        if (name.isEmpty() || color.isEmpty()) {
             JOptionPane.showMessageDialog(null, "One Or More Fields Are Empty");
         } else {
-            
+            model.addRow(new Object[]{name, color, qty, category});
+            JOptionPane.showMessageDialog(null, "Data Inserted");
+            clearFields();
+//            System.out.println("Name : "+ name);
+//            System.out.println("Qty : "+ qty);
+//            System.out.println("Color : "+ color);
+//            System.out.println("Categroy : "+ category);
         }
+        
     }//GEN-LAST:event_jButton1ActionPerformed
+    
     
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
         // TODO add your handling code here:
@@ -217,6 +271,49 @@ public class Form extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jCategoryActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+                // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+    
+    
+     public void addTableHeader() {
+        model = (DefaultTableModel) jTable1.getModel();
+        Object[] newIdentifiers = new Object[]{"name", "color", "qty","category"};
+        model.setColumnIdentifiers(newIdentifiers);
+//        jTable1.setCellRenderer(new myTableCellRenderer());
+    }
+    
+    class myTableCellRenderer implements TableCellRenderer {
+ 
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+ 
+//            Change Image column minimum width and maximum width
+            TableColumn tb = jTable1.getColumn("Image");
+            tb.setMaxWidth(60);
+            tb.setMinWidth(60);
+            jTable1.setRowHeight(60);
+            return (Component) value;
+ 
+        }
+ 
+    }
+    private void clearFields() {
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jQty.setValue(0);
+        jCategory.setSelectedIndex(0);
+    }
+    
+    
+     
+    
+ 
+//     private void populateInptFields(){
+//         int selectedRow = jTable1.getSelectedRow();
+//         String tableGender = model.getValueAt(selectedRow, 1).toString();
+//         
+//     }
     /**
      * @param args the command line arguments
      */
@@ -264,7 +361,9 @@ public class Form extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JSpinner jQty;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables

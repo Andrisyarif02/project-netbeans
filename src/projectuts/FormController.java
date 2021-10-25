@@ -38,9 +38,4 @@ public class FormController {
     FormController(Form aThis) {
          //To change body of generated methods, choose Tools | Templates.
     }
-    public AddDataToJTable() {
-        initComponents();
-        //Calling method/function to add column header to jtable
-        addTableHeader();
-    }
 }

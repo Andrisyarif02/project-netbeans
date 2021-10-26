@@ -376,7 +376,7 @@ public class Form extends javax.swing.JFrame {
         list.add(jTextField3.getText());
         list.add(jCategory.getSelectedItem().toString());
         model.addRow(list.toArray());
-//        noTable(model);
+        noTable(model);
 
         Item item = new Item(jTextField1.getText(), jTextField2.getText(), (Integer) jQty.getValue(),Integer.valueOf(jTextField3.getText()) , jCategory.getSelectedItem().toString());
         itemList.add(item);
@@ -550,7 +550,7 @@ public class Form extends javax.swing.JFrame {
                 excelImportToJTable = new XSSFWorkbook(excelBIS);
                 XSSFSheet excelSheet = excelImportToJTable.getSheetAt(0);
  
-                for (int row = 0; row < excelSheet.getLastRowNum(); row++) {
+                for (int row = 1; row <= excelSheet.getLastRowNum(); row++) {
                     XSSFRow excelRow = excelSheet.getRow(row);
                     System.out.println();
                     XSSFCell excelName = excelRow.getCell(0);
@@ -560,7 +560,7 @@ public class Form extends javax.swing.JFrame {
                     XSSFCell excelCategory = excelRow.getCell(4);
  
 //                    JLabel excelJL = new JLabel(new ImageIcon(new ImageIcon(excelImage.getStringCellValue()).getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH)));
-                    model.addRow(new Object[]{excelName, excelColor, excelQty, excelPrice, excelCategory});
+                    model.addRow(new Object[]{row, excelName, excelColor, excelQty, excelPrice, excelCategory});
                 }
                 JOptionPane.showMessageDialog(null, "Imported Successfully !!.....");
             } catch (IOException iOException) {

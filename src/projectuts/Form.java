@@ -20,6 +20,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
@@ -30,6 +31,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.apache.commons.collections4.*;
 import org.apache.commons.compress.*;
 import org.apache.logging.log4j.LogManager;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 /**
  *
  * @author Andri
@@ -245,6 +247,11 @@ public class Form extends javax.swing.JFrame {
         });
 
         jBtnImport.setText("Import");
+        jBtnImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnImportActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -462,6 +469,90 @@ public class Form extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jBtnExportActionPerformed
+
+    private void jBtnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnImportActionPerformed
+                // TODO add your handling code here:
+//        JFileChooser loadfile = jFileChooser1;
+//        String defaultCurrentDirectoryPath = "";
+//        try {
+//            //buka workbook dari excel
+//            
+//            Workbook workbook = WorkbookFactory.create(new File(defaultCurrentDirectoryPath));
+//            
+//            Sheet sheet = workbook.getSheetAt(0);
+//            
+//            Row row = sheet.getRow(1);
+//            
+//            // Get the Cell at index 2 from the above row
+//            Cell cell = row.getCell(2);
+//
+//            // Create the cell if it doesn't exist
+//            if (cell == null)
+//                cell = row.createCell(2);
+//
+//            // Update the cell's value
+//            cell.setCellType(CellType.STRING);
+//            cell.setCellValue("Updated Value");
+//
+//            // Write the output to the file
+//            FileOutputStream fileOut = new FileOutputStream("existing-spreadsheet.xlsx");
+//            workbook.write(fileOut);
+//            fileOut.close();
+//
+//            // Closing the workbook
+//            workbook.close();
+//        } catch (IOException e) {
+//        }
+        
+        File excelFile;
+        FileInputStream excelFIS = null;
+        BufferedInputStream excelBIS = null;
+        XSSFWorkbook excelImportToJTable = null;
+        String defaultCurrentDirectoryPath = "";
+        JFileChooser excelFileChooser = new JFileChooser(defaultCurrentDirectoryPath);
+        excelFileChooser.setDialogTitle("Select Excel File");
+        FileNameExtensionFilter fnef = new FileNameExtensionFilter("EXCEL FILES", "xls", "xlsx", "xlsm");
+        excelFileChooser.setFileFilter(fnef);
+        int excelChooser = excelFileChooser.showOpenDialog(null);
+        if (excelChooser == JFileChooser.APPROVE_OPTION) {
+            try {
+                excelFile = excelFileChooser.getSelectedFile();
+                excelFIS = new FileInputStream(excelFile);
+                excelBIS = new BufferedInputStream(excelFIS);
+                excelImportToJTable = new XSSFWorkbook(excelBIS);
+                XSSFSheet excelSheet = excelImportToJTable.getSheetAt(0);
+ 
+                for (int row = 0; row < excelSheet.getLastRowNum(); row++) {
+                    XSSFRow excelRow = excelSheet.getRow(row);
+ 
+                    XSSFCell excelName = excelRow.getCell(0);
+                    XSSFCell excelColor = excelRow.getCell(1);
+                    XSSFCell excelQty = excelRow.getCell(2);
+                    XSSFCell excelCategory = excelRow.getCell(3);
+ 
+//                    JLabel excelJL = new JLabel(new ImageIcon(new ImageIcon(excelImage.getStringCellValue()).getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH)));
+                    model.addRow(new Object[]{excelName, excelColor, excelQty, excelCategory});
+                }
+                JOptionPane.showMessageDialog(null, "Imported Successfully !!.....");
+            } catch (IOException iOException) {
+                JOptionPane.showMessageDialog(null, iOException.getMessage());
+            } finally {
+                try {
+                    if (excelFIS != null) {
+                        excelFIS.close();
+                    }
+                    if (excelBIS != null) {
+                        excelBIS.close();
+                    }
+                    if (excelImportToJTable != null) {
+                        excelImportToJTable.close();
+                    }
+                } catch (IOException iOException) {
+                    JOptionPane.showMessageDialog(null, iOException.getMessage());
+                }
+            }
+        }
+    }//GEN-LAST:event_jBtnImportActionPerformed
  
 //     private void populateInptFields(){
 //         int selectedRow = jTable1.getSelectedRow();
